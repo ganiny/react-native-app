@@ -1,14 +1,13 @@
+import { useUser } from "@clerk/expo";
 import ListHeading from "@/components/ListHeading";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
 import {
   HOME_BALANCE,
   HOME_SUBSCRIPTIONS,
-  HOME_USER,
   UPCOMING_SUBSCRIPTIONS,
 } from "@/constants/data";
 import { icons } from "@/constants/icons";
-import images from "@/constants/images";
 import { formatCurrency } from "@/lib/utils";
 import dayjs from "dayjs";
 import { styled } from "nativewind";
@@ -19,9 +18,15 @@ import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function HomeScreen() {
+  const { user } = useUser();
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
     string | null
   >(null);
+
+  const displayName =
+    user?.fullName || user?.firstName || "User";
+  const avatarUrl = user?.imageUrl;
+
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
       <FlatList
@@ -29,8 +34,19 @@ export default function HomeScreen() {
           <>
             <View className="home-header">
               <View className="home-user">
-                <Image source={images.avatar} className="home-avatar" />
-                <Text className="home-user-name">{HOME_USER.name}</Text>
+                {avatarUrl ? (
+                  <Image
+                    source={{ uri: avatarUrl }}
+                    className="home-avatar"
+                  />
+                ) : (
+                  <View className="auth-logo-mark">
+                    <Text className="auth-logo-mark-text">
+                      {displayName.charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
+                <Text className="home-user-name">{displayName}</Text>
               </View>
 
               <TouchableOpacity className="home-add-button">
